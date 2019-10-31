@@ -4,7 +4,7 @@
   <!-- instructions -->
 
   <div *ngIf="showError" class="errors">
-    A price should include only numbers, commas, and a single decimal point.
+    A price should include only numbers, commas, and a single decimal point. Please enter a maximum of 2 digits for cents.
   </div>
 
   <form [formGroup]="priceForm" (ngSubmit)="priceSubmitted()">
