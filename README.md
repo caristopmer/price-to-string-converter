@@ -2,8 +2,8 @@
 
 This is a simple application to allow a user to enter a numeric price number in dollars and convert it to its string counterpart. For example:
 
-`123.78` -> 'One hundred twenty three and 78/100 dollars'
-`4,938.42` -> 'Four thousand nine hundred thirty eight and 42/100 dollars'
+`123.78` -> 'One hundred twenty three and 78/100 dollars'\
+`4,938.42` -> 'Four thousand nine hundred thirty eight and 42/100 dollars'\
 `2,392,372,565.00` -> 'Two billion three hundred ninety two million three hundred seventy two thousand five hundred sixty five and 0/100 dollars'
 
 ## Running the Application
