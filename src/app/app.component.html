@@ -1,30 +1,24 @@
 <div class="content-container">
   <h1>Price to String Converter 1000</h1>
 
-  <!-- instructions -->
+  <p class="instructions">
+    Welcome to the Price to String Converter 1000! Please enter a numeric price
+    below, and watch as it is transformed into the string representation of itself. 
+    (Please enter only digits, commas, and a single decimal point!)
+  </p>
 
-  <div *ngIf="showError" class="errors">
-    A price should include only numbers, commas, and a single decimal point. Please enter a maximum of 2 digits for cents.
-  </div>
+  <p *ngIf="showError" class="errors">
+    A price should include only numbers, commas, and a single decimal point. 
+    Please enter a maximum of 2 digits for cents.
+  </p>
 
   <form [formGroup]="priceForm" (ngSubmit)="priceSubmitted()">
-    $<input type="text" formControlName="price" class="">
-    <button type="submit">submit</button>
+    $ <input type="text" formControlName="price" class="price-input"><br>
+    <button type="submit">Convert</button>
   </form>
 
-  <div class="result">
-    <h3>Result:</h3>
+  <h3>Result:</h3>
+  <p class="result">
     {{result}}
-  </div>
-  
-
-
-
-
-
-
-
-
-
-
+  </p>
 </div>

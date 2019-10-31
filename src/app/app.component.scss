@@ -1,12 +1,24 @@
 .content-container {
   margin: auto;
-  width: 30rem;
+  width: 35rem;
   min-height: 100vh;
-  border: 1px solid purple;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ffab00;
+
+  p {
+    width: 80%;
+    font-size: .9rem;
+  }
 
   .errors {
     color: red;
     margin-bottom: 1rem;
+  }
+
+  .price-input {
+    width: 10rem;
   }
 }

@@ -17,21 +17,13 @@ export class AppComponent implements OnInit {
     private formBuilder: FormBuilder
   ) {}
 
-  // input validation
-  // - should be only numbers, commas, and one decimal point
-  // display any errors
-
-  // break off the cents and store in the component
-  // strip out any commas
-  // break the price into an array of groups of 3, starting from the end
-  // need a function to evaluate up to a 3 digit number into text
-  // (maybe have another for 2 digit that could be used by the 3 digit one as well)
-  // depending one how many groups there are, append thousand or hundred to each group string
-
   ngOnInit() {
     this.priceForm = this.formBuilder.group({ price: [null, Validators.required] });
   }
 
+  /**
+   * Orchestrator function used when a user submits a number for conversion.
+   */
   priceSubmitted() {
     const priceInput = this.priceForm.controls.price.value;
     this.showError = !this.validSubmission(priceInput);
@@ -42,15 +34,18 @@ export class AppComponent implements OnInit {
     }
   }
 
+  /**
+   * Check the validity of a user-entered price.
+   * @param price The price string of which to check validity.
+   */
   validSubmission(price: string): boolean {
-    // Check to make sure input consists of only valid characters
+    // Check to make sure input consists of only valid characters.
     const validCharacters = '0123456789,.';
     for (const char of price.split('')) {
       if (!validCharacters.includes(char)) {
         return false;
       }
     }
-
     // Check that there is only one decimal point included, and at most 2 digits of cents.
     const dollarsAndCentsArray = price.split('.');
     if (dollarsAndCentsArray.length > 2) {
@@ -60,108 +55,63 @@ export class AppComponent implements OnInit {
         return false;
       }
     }
-
     return true;
   }
 
-  // currently just breaking down the input and formatting the dollars into accurate comma groups
-  // still need to orchestrate counting the number of comma groups and adding the correct number text
-  // after the groups
+  /**
+   * Format the entered price into number groups that would be separated by commas.
+   * @param price The price string to format.
+   */
   formatCommaGroups(price: string): string[] {
     const dollars = price.split('.')[0];
     const cents = price.split('.')[1];
     this.cents = cents ? parseInt(cents, 10) : 0;
 
-    // Insert commas in the correct places in order to later split the number into comma groups
+    // Insert commas in the correct places in order to later split the number into comma groups.
     // Reversed to group into 3's starting from the end of the number.
     let insertions = 0;
     const reversedPrice = dollars.split('').reverse();
     for (let i = 1; i <= reversedPrice.length; i++) {
       if (
-        // every third place
+        // every third place.
         i / 3 >= 1 &&
-        // no remainder
+        // no remainder.
         i % 3 === 0 &&
-        // not at the end of the string
+        // not at the end of the string.
         i + insertions < reversedPrice.length
       ) {
         reversedPrice.splice(i + insertions, 0, ',');
         insertions++;
       }
     }
-    // Reverse the array back again, join, and split on the new commas
+    // Reverse the array back again, join, and split on the new commas.
     return reversedPrice.reverse().join('').split(',');
   }
 
-  convertOnesPlace(digit: number): string {
-    const onesMapping = {
-      0: '',
-      1: 'one',
-      2: 'two',
-      3: 'three',
-      4: 'four',
-      5: 'five',
-      6: 'six',
-      7: 'seven',
-      8: 'eight',
-      9: 'nine'
-    };
-    return onesMapping[digit];
-  }
-
-  convertTensPlace(digit: number): string {
-    const tensMapping = {
-      0: '',
-      2: 'twenty',
-      3: 'thirty',
-      4: 'forty',
-      5: 'fifty',
-      6: 'sixty',
-      7: 'seventy',
-      8: 'eighty',
-      9: 'ninety'
-    };
-    return tensMapping[digit];
-  }
-
-  convertTeenNumbers(digits: number): string {
-    const teensMapping = {
-      10: 'ten',
-      11: 'eleven',
-      12: 'twelve',
-      13: 'thirteen',
-      14: 'fourteen',
-      15: 'fifteen',
-      16: 'sixteen',
-      17: 'seventeen',
-      18: 'eighteen',
-      19: 'nineteen',
-    };
-    return teensMapping[digits];
-  }
-
-  convertHundredsPlace(digit: number): string {
-    return this.convertOnesPlace(digit) + ' hundred';
-  }
-
+  /**
+   * Orchestrator for assembling the final output string based on the formatted
+   * comma groups.
+   * @param commaGroups The array of formatted comma groups from which to build the string.
+   */
   buildFullString(commaGroups: string[]): string {
-    // takes in the commagroups array
-    // iterate through and call another function to build the string piece for the comma group
-    // add whatever (million, thousand, etc.) to the end of the number group based on position in array
-
     const finalString: string[] = [];
     for (let i = 0; i < commaGroups.length; i++) {
       finalString.push(this.buildCommaGroupString(commaGroups[i], (commaGroups.length - 1 - i)));
     }
-
     finalString.push(this.appendCentsString());
-
+    // Capitalize the first letter.
     finalString[0] = finalString[0].charAt(0).toUpperCase() + finalString[0].slice(1);
     return finalString.join(' ');
   }
 
+  /**
+   * Builds a string subsection based on the passed in comma group, and adds an overall value
+   * to that group (thousand, million, etc.)
+   * @param commaGroup The comma group for which to build a string subsection.
+   * @param remainingGroups How many groups are left in the overall price, after the current one.
+   * Used to determine which overall value descriptor to add at the end.
+   */
   buildCommaGroupString(commaGroup: string, remainingGroups: number): string {
-    // remaining groups is length-1 less current index
     const groupValues = {
       0: '',
       1: 'thousand',
@@ -177,7 +127,7 @@ export class AppComponent implements OnInit {
     };
 
     const groupString: string[] = [];
-    // flag to denote that a number 10-19 was present, and to skip the ones place conversion
+    // flag to denote that a number 10-19 was present, and to skip the ones place conversion.
     let teenNumberUsed = false;
 
     for (let i = 0; i < commaGroup.length; i++) {
@@ -232,12 +182,77 @@ export class AppComponent implements OnInit {
     return groupString.join(' ');
   }
 
+  /**
+   * Helper function to convert a digit in the ones place to its string counterpart.
+   * @param digit The numeric digit to convert.
+   */
+  convertOnesPlace(digit: number): string {
+    const onesMapping = {
+      0: '',
+      1: 'one',
+      2: 'two',
+      3: 'three',
+      4: 'four',
+      5: 'five',
+      6: 'six',
+      7: 'seven',
+      8: 'eight',
+      9: 'nine'
+    };
+    return onesMapping[digit];
+  }
+
+  /**
+   * Helper function to convert a digit in the tens place to its string counterpart.
+   * @param digit The numeric digit to convert.
+   */
+  convertTensPlace(digit: number): string {
+    const tensMapping = {
+      0: '',
+      2: 'twenty',
+      3: 'thirty',
+      4: 'forty',
+      5: 'fifty',
+      6: 'sixty',
+      7: 'seventy',
+      8: 'eighty',
+      9: 'ninety'
+    };
+    return tensMapping[digit];
+  }
+
+  /**
+   * Helper function to convert a number 10-19 in the tens/ones place to its string counterpart.
+   * @param digit The numeric digits to convert.
+   */
+  convertTeenNumbers(digits: number): string {
+    const teensMapping = {
+      10: 'ten',
+      11: 'eleven',
+      12: 'twelve',
+      13: 'thirteen',
+      14: 'fourteen',
+      15: 'fifteen',
+      16: 'sixteen',
+      17: 'seventeen',
+      18: 'eighteen',
+      19: 'nineteen',
+    };
+    return teensMapping[digits];
+  }
+
+  /**
+   * Helper function to convert a digit in the hundreds place to its string counterpart.
+   * @param digit The numeric digit to convert.
+   */
+  convertHundredsPlace(digit: number): string {
+    return this.convertOnesPlace(digit) + ' hundred';
+  }
+
+  /**
+   * Append the inputted cents value back onto the finished string, formatted appropriately.
+   */
   appendCentsString() {
     return `and ${this.cents}/100 dollars`;
   }
 }
-
-// styling
-// display history
-// more robust to add hyphens where needed
-// support larger numbers
