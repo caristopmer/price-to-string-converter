@@ -1,0 +1,12 @@
+.content-container {
+  margin: auto;
+  width: 30rem;
+  min-height: 100vh;
+  border: 1px solid purple;
+  text-align: center;
+
+  .errors {
+    color: red;
+    margin-bottom: 1rem;
+  }
+}
